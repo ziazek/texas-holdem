@@ -44,6 +44,12 @@ Possibly useful: spaceship operator to do sorting between hands. each_cons.
 
 3. If it's a straight, it can't be a four of a kind or a full house
 
+4. Need to sort the Two Pair such that the higher pair is in front. 
+
+## Notes
+
+`cons` in the code refers to consecutive sets of cards pumped in by `each_cons`
+
 ## Results
 
 ## Review

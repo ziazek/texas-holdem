@@ -5,6 +5,7 @@ require 'benchmark'
 
 LIST = ["Royal Flush", "Straight Flush", "Four of a Kind", "Full House", "Flush", "Straight", "Three of a Kind", "Two Pair", "Pair", "High Card"]
 VALUES = "AKQJT98765432".chars
+SUITS = "shdc".chars
 
 class Texas
   def initialize(sets_of_cards)
@@ -56,13 +57,24 @@ class CardSet
       cards << LIST[3] 
     elsif is_flush
       cards << LIST[4]
+    elsif is_straight
+      cards << LIST[5] 
+    elsif is_three_of_a_kind
+      cards << LIST[6] 
+    elsif is_two_pair
+      cards << LIST[7]
+    elsif is_pair
+      cards << LIST[8]
+    else # is High Card
+      self.cards = @sorted
+      cards << LIST[9]
     end
     cards
   end
 
   def check_straight
     # binding.pry
-    @sorted = cards.sort_by { |c| VALUES.index(c[0]) } # find the value - e.g. "Kc" returns 1, which is the position of K in VALUES array
+    @sorted = sort(self.cards) # find the value - e.g. "Kc" returns 1, which is the position of K in VALUES array
     # sorted must be unique by value
     unique_by_val = @sorted.uniq { |e| e[0] }
     unique_by_val.each_cons(5) do |cons|
@@ -96,32 +108,71 @@ class CardSet
     # find threes
     # set the remainder in a variable, or return false
     # find pair
+    rem = nil
     @sorted.each_cons(3) do |cons|
       if find_difference_between(cons).all? { |d| d == 0 }
         @threes = cons
-        @remainder = @sorted - @threes
+        rem = @sorted - @threes
+        self.cards = @threes + (@sorted - @threes) 
+        # in case there is no full house, this puts the cards in order for Three of a Kind
       end
     end
     return false unless @threes
 
-    @remainder.each_cons(2) do |cons|
+    rem.each_cons(2) do |cons|
       if find_difference_between(cons).all? { |d| d == 0 }
         @pair = cons
-        return self.cards = @threes + @pair + (@remainder - @pair)
+        return self.cards = @threes + @pair + (rem - @pair)
       end
     end
     false
   end
 
   def is_flush
-    # WIP
-    # sorted_by_suit = cards.sort_by { |c| c[1] }
-    suits = Hash.new(0)
-    cards.each do |card|
-      suits[card[1]] += 1
+    sorted_by_suit = cards.sort_by { |c| c[1] }
+    sorted_by_suit.each_cons(5) do |cons|
+      if find_difference_between_suit(cons).all? { |d| d == 0 }
+        return self.cards = sort(cons) + sort(sorted_by_suit - cons) 
+        # we sort the flush so that the highest card is first, and also the kickers
+      end
     end
-    # move same suit to the front of the order
-    puts sorted_by_suit.join(' '), suits
+    false
+  end
+
+  def is_straight
+    @straight
+  end
+
+  def is_three_of_a_kind
+    @threes
+  end
+
+  def is_two_pair
+    rem = nil
+    @sorted.each_cons(2) do |cons|
+      if find_difference_between(cons).all? { |d| d == 0 }
+        @pair = cons
+        rem = @sorted - @pair
+        self.cards = @pair + (@sorted - @pair)
+        # in case there is no Two Pair, this puts the cards in order for Pair
+      end
+    end
+
+    return false unless @pair
+
+    rem.each_cons(2) do |cons|
+      if find_difference_between(cons).all? { |d| d == 0 }
+        @pair2 = cons
+        # sort the Two Pair such that the higher pair is first in order
+        sorted_pairs = [@pair, @pair2].sort_by { |arr| VALUES.index(arr.first[0]) }
+        return self.cards = sorted_pairs.flatten + (rem - @pair2)
+      end
+    end    
+    false
+  end
+
+  def is_pair
+    @pair
   end
 
   def flush?(sequence)
@@ -137,6 +188,16 @@ class CardSet
     diffs = []
     cons.each_cons(2) { |x, y| diffs << (VALUES.index(y[0]) - VALUES.index(x[0])) } 
     diffs
+  end
+
+  def find_difference_between_suit(cons)
+    diffs = []
+    cons.each_cons(2) { |x, y| diffs << (SUITS.index(y[1]) - SUITS.index(x[1])) } 
+    diffs
+  end
+
+  def sort(card_set)
+    card_set.sort_by { |c| VALUES.index(c[0]) }
   end
 end
 
