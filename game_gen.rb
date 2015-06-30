@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
+# Credit: Matthew (http://rubyquiz.com/quiz24.html)
+
 FACES = "AKQJT98765432"
 SUITS = "cdhs"
 

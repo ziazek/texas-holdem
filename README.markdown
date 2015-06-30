@@ -42,6 +42,8 @@ Possibly useful: spaceship operator to do sorting between hands. each_cons.
 
 2. Determine which five cards make the hand. Run down from the top of the listing to see if there is any match. If there is, move the 5 cards to the front of the listing. 
 
+3. If it's a straight, it can't be a four of a kind or a full house
+
 ## Results
 
 ## Review
