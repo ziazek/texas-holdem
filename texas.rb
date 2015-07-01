@@ -3,22 +3,22 @@
 require 'pry-byebug'
 require 'benchmark'
 
-LIST = ["Royal Flush", "Straight Flush", "Four of a Kind", "Full House", "Flush", "Straight", "Three of a Kind", "Two Pair", "Pair", "High Card"]
+LIST = ["Royal Flush", "Straight Flush", "Four of a Kind", "Full House", "Flush", "Straight", "Three of a Kind", "Two Pair", "Pair", "High Card", ""]
 VALUES = "AKQJT98765432".chars
 SUITS = "shdc".chars
 
 class Texas
   def initialize(sets_of_cards)
     @sets_of_cards = sets_of_cards 
-    @parsed_hands = []
+    @parsed_sets = []
     @sets_of_cards.collect do |cards|
-      @parsed_hands << CardSet.new(cards)
+      @parsed_sets << CardSet.new(cards)
     end
     mark_winner
   end
 
   def render
-    @parsed_hands.each do |card_set|
+    @parsed_sets.each do |card_set|
       puts card_set.render
     end
   end
@@ -27,47 +27,130 @@ class Texas
 
   def mark_winner
     # use the spaceship operator to compare between CardSets?
+    sorted = @parsed_sets.sort
+    top_sets = sorted.take_while { |next_top| next_top == sorted.first }
+    top_sets.map(&:mark_winner)
   end
 end
 
 class CardSet
-  attr_accessor :cards
+  include Comparable
+  attr_accessor :cards, :name
 
   def initialize(cards)
     @cards = cards.split(' ')
+    @name = ""
     find_hand
   end
 
   def render
-    cards.join(' ')
+    ary = cards.push(name)
+    ary.push("(Winner)") if @winner
+    ary.join(' ')
+  end
+
+  def mark_winner
+    @winner = true
+  end
+
+  def <=>(another)
+    if LIST.index(name) != LIST.index(another.name)
+      # hands are different type
+      return LIST.index(name) <=> LIST.index(another.name)
+    else
+      # hands are of the same type
+      case LIST.index(name)
+      when 0, 1, 5 # straights have no kicker - just compare high card
+        return compare_first_card(another)
+      when 2 # four of a kind have one kicker - compare the fours first.
+        if !first_card_eql?(another)
+          # fours are different value, compare fours
+          return compare_first_card(another)
+        else
+          # compare kicker
+          return compare_kickers(another) { |c| c.slice(4,1) }
+        end
+      when 3 # full house, no kicker. Compare threes then pair
+        if !first_card_eql?(another)
+          # threes are different value, compare threes
+          return compare_first_card(another)
+        else
+          # compare pair
+          return VALUES.index(cards[3][0]) <=> VALUES.index(another.cards[3][0])
+        end 
+      when 4 # flush
+        return compare_kickers(another) { |c| c.take(5) }
+      when 6 # three of a kind. compare threes then the 2 kickers
+        if !first_card_eql?(another)
+          return compare_first_card(another)
+        else
+          return compare_kickers(another) { |c| c.slice(3, 2) }
+        end
+      when 7 # two pair. compare first pair, then second pair, then kicker
+        if !first_card_eql?(another)
+          return compare_first_card(another)
+        elsif VALUES.index(cards[2][0]) != VALUES.index(another.cards[2][0])
+          return VALUES.index(cards[2][0]) <=> VALUES.index(another.cards[2][0])
+        else
+          return compare_kickers(another) { |c| c.slice(4, 1) }
+        end
+      when 8 # pair. compare first pair, then 3 kickers
+        if !first_card_eql?(another)
+          return compare_first_card(another)
+        else
+          return compare_kickers(another) { |c| c.slice(2, 3) }
+        end
+      else
+        return compare_kickers(another) { |c| c.take(5) }
+      end 
+    end
   end
 
   private
+
+  def first_card_eql?(another)
+    VALUES.index(cards.first[0]) == VALUES.index(another.cards.first[0])
+  end
+
+  def compare_first_card(another)
+    VALUES.index(cards.first[0]) <=> VALUES.index(another.cards.first[0])
+  end
+
+  def compare_kickers(another)
+    # compare card by card until one is higher than the other. Only compare 5 cards.
+    ary = yield(self.cards)
+    another_ary = yield(another.cards)
+    # puts "#{ary}, #{another_ary}"
+    ary.zip(another_ary).each_with_index do |card_pair, i|
+      return VALUES.index(card_pair.first[0]) <=> VALUES.index(card_pair.last[0]) unless i < (ary.size-1) && VALUES.index(card_pair.first[0]) == VALUES.index(card_pair.last[0]) 
+      # if it reaches the last pair of cards, just return the spaceship.
+    end
+  end
 
   def find_hand
     return cards if cards.size < 7
     check_straight # @sorted, @straight calculated here
     if is_royal_flush
-      cards << LIST[0]
+      self.name = LIST[0]
     elsif is_straight_flush
-      cards << LIST[1]
+      self.name = LIST[1]
     elsif is_four_of_a_kind
-      cards << LIST[2]
+      self.name = LIST[2]
     elsif is_full_house # @threes calculated here
-      cards << LIST[3] 
+      self.name = LIST[3] 
     elsif is_flush
-      cards << LIST[4]
+      self.name = LIST[4]
     elsif is_straight
-      cards << LIST[5] 
+      self.name = LIST[5] 
     elsif is_three_of_a_kind
-      cards << LIST[6] 
+      self.name = LIST[6] 
     elsif is_two_pair
-      cards << LIST[7]
+      self.name = LIST[7]
     elsif is_pair
-      cards << LIST[8]
+      self.name = LIST[8]
     else # is High Card
       self.cards = @sorted
-      cards << LIST[9]
+      self.name = LIST[9]
     end
     cards
   end
@@ -209,6 +292,6 @@ unless ARGV.length == 1 && test(?e, ARGV[0])
 end
 
 puts Benchmark.measure {
-  game = Texas.new(ARGF.readlines.map(&:chomp))
+  game = Texas.new(ARGF.readlines.map(&:chomp).reject { |l| l.include?("#") || l.empty? })
   game.render
 }

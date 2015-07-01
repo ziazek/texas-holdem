@@ -1,10 +1,11 @@
-Kc Ac Tc Qc Jc 6d Ts
 2c 3h 5h 4h 2h 6h Qh
 7c 7h 2d 4d 7d Th 7s
 3s 4h Th 4d 3h 3c Qc
-2h 5h 8h Tc Qh 3s Kh
-7d 6c 5c 4s Kh 3h As
 4s 8s Ah 8d Tc 8h 2d
+2h 5h 8h Tc Qh 3s Kh
+Qc Qh
+7d 6c 5c 4s Kh 3h As
 7h 8c 9h 7d 8d Tc 2c
 7h 8c 9h 7d 3d Tc 2c
 5h 8c 9h 7d 3d Tc 2c
+Kc Ac Tc Qc Jc 6d Ts
