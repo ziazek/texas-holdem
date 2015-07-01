@@ -86,7 +86,7 @@ Ac Kc Qc Jc Tc Ts 6d Royal Flush (Winner)
 
 ## Review
 
-- replace variable `another` with instance variable `@another` to make it DRY
+- replace variable `another` with instance variable `@another` to make it DRY (done)
 
 ## License
 
