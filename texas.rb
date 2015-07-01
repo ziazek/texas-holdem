@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require 'pry-byebug'
+# require 'pry-byebug'
 require 'benchmark'
 
 LIST = ["Royal Flush", "Straight Flush", "Four of a Kind", "Full House", "Flush", "Straight", "Three of a Kind", "Two Pair", "Pair", "High Card", ""]
@@ -54,72 +54,73 @@ class CardSet
   end
 
   def <=>(another)
-    if LIST.index(name) != LIST.index(another.name)
+    @another = another
+    if LIST.index(name) != LIST.index(@another.name)
       # hands are different type
-      return LIST.index(name) <=> LIST.index(another.name)
+      return LIST.index(name) <=> LIST.index(@another.name)
     else
       # hands are of the same type
       case LIST.index(name)
       when 0, 1, 5 # straights have no kicker - just compare high card
-        return compare_first_card(another)
+        return compare_first_card
       when 2 # four of a kind have one kicker - compare the fours first.
-        if !first_card_eql?(another)
+        if !first_card_eql?
           # fours are different value, compare fours
-          return compare_first_card(another)
+          return compare_first_card
         else
           # compare kicker
-          return compare_kickers(another) { |c| c.slice(4,1) }
+          return compare_kickers { |c| c.slice(4,1) }
         end
       when 3 # full house, no kicker. Compare threes then pair
-        if !first_card_eql?(another)
+        if !first_card_eql?
           # threes are different value, compare threes
-          return compare_first_card(another)
+          return compare_first_card
         else
           # compare pair
-          return VALUES.index(cards[3][0]) <=> VALUES.index(another.cards[3][0])
+          return VALUES.index(cards[3][0]) <=> VALUES.index(@another.cards[3][0])
         end 
       when 4 # flush
-        return compare_kickers(another) { |c| c.take(5) }
+        return compare_kickers { |c| c.take(5) }
       when 6 # three of a kind. compare threes then the 2 kickers
-        if !first_card_eql?(another)
-          return compare_first_card(another)
+        if !first_card_eql?
+          return compare_first_card
         else
-          return compare_kickers(another) { |c| c.slice(3, 2) }
+          return compare_kickers { |c| c.slice(3, 2) }
         end
       when 7 # two pair. compare first pair, then second pair, then kicker
-        if !first_card_eql?(another)
-          return compare_first_card(another)
-        elsif VALUES.index(cards[2][0]) != VALUES.index(another.cards[2][0])
-          return VALUES.index(cards[2][0]) <=> VALUES.index(another.cards[2][0])
+        if !first_card_eql?
+          return compare_first_card
+        elsif VALUES.index(cards[2][0]) != VALUES.index(@another.cards[2][0])
+          return VALUES.index(cards[2][0]) <=> VALUES.index(@another.cards[2][0])
         else
-          return compare_kickers(another) { |c| c.slice(4, 1) }
+          return compare_kickers { |c| c.slice(4, 1) }
         end
       when 8 # pair. compare first pair, then 3 kickers
-        if !first_card_eql?(another)
-          return compare_first_card(another)
+        if !first_card_eql?
+          return compare_first_card
         else
-          return compare_kickers(another) { |c| c.slice(2, 3) }
+          return compare_kickers { |c| c.slice(2, 3) }
         end
       else
-        return compare_kickers(another) { |c| c.take(5) }
+        return compare_kickers { |c| c.take(5) }
       end 
     end
   end
 
   private
 
-  def first_card_eql?(another)
-    VALUES.index(cards.first[0]) == VALUES.index(another.cards.first[0])
+  def first_card_eql?
+    VALUES.index(cards.first[0]) == VALUES.index(@another.cards.first[0])
   end
 
-  def compare_first_card(another)
-    VALUES.index(cards.first[0]) <=> VALUES.index(another.cards.first[0])
+  def compare_first_card
+    VALUES.index(cards.first[0]) <=> VALUES.index(@another.cards.first[0])
   end
 
-  def compare_kickers(another)
+  def compare_kickers
     # compare card by card until one is higher than the other. Only compare 5 cards.
     ary = yield(self.cards)
-    another_ary = yield(another.cards)
+    another_ary = yield(@another.cards)
     # puts "#{ary}, #{another_ary}"
     ary.zip(another_ary).each_with_index do |card_pair, i|
       return VALUES.index(card_pair.first[0]) <=> VALUES.index(card_pair.last[0]) unless i < (ary.size-1) && VALUES.index(card_pair.first[0]) == VALUES.index(card_pair.last[0]) 
@@ -156,7 +157,6 @@ class CardSet
   end
 
   def check_straight
-    # binding.pry
     @sorted = sort(self.cards) # find the value - e.g. "Kc" returns 1, which is the position of K in VALUES array
     # sorted must be unique by value
     unique_by_val = @sorted.uniq { |e| e[0] }
@@ -283,8 +283,6 @@ class CardSet
     card_set.sort_by { |c| VALUES.index(c[0]) }
   end
 end
-
-
 
 unless ARGV.length == 1 && test(?e, ARGV[0])
   puts "Usage: #{$PROGRAM_NAME} hand.txt"

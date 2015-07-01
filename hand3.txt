@@ -2,42 +2,42 @@
 # Kc Ac Tc Qc Jc 6d Ts
 # Kh Ah Th Qh Jh 6d Ts
 
-# # Straight Flush
-# 2c 3h 5h 4h 2h 6h Qh
-# 2c 3h 5h 4h 2h 6h 7h
+# Straight Flush
+2c 3h 5h 4h 2h 6h Qh
+2c 3h 5h 4h 2h 6h 7h
 
-# # four of a kind
-# 7c 7h 2d 4d 7d Th 7s
-# 7c 7h 2d 4d 7d Th 7s
-# 7c 7h 2d 6d 7d Qc 7s
+# four of a kind
+7c 7h 2d 4d 7d Th 7s
+7c 7h 2d 4d 7d Th 7s
+7c 7h 2d 6d 7d Qc 7s
 
-# # full house
-# 3s 4h Th 4d 3h 3c Qc
-# 5s 4h Th 4d 5h 5c Qc
+# full house
+3s 4h Th 4d 3h 3c Qc
+5s 4h Th 4d 5h 5c Qc
 
-# # flush
-# 2h 5h 8h Tc Qh 3s Kh
-# 3h 5h 8h 2c Qh 3s Kh
-# 3h 5h 8h Tc Qh 3s Kh
+# flush
+2h 5h 8h Tc Qh 3s Kh
+3h 5h 8h 2c Qh 3s Kh
+3h 5h 8h Tc Qh 3s Kh
 
-# # three of a kind
-# 4s 8s Ah 8d Tc 8h 2d
-# # 4s 9s Ah 9d Tc 9h 2d
-# 5s 8s Kh 8d Tc 8h 3d
+# three of a kind
+4s 8s Ah 8d Tc 8h 2d
+# 4s 9s Ah 9d Tc 9h 2d
+5s 8s Kh 8d Tc 8h 3d
 
-# # straight
-# 7d 6c 5c 4s Kh 3h As
-# 7d 6c 5c 4s 8h 3h As
+# straight
+7d 6c 5c 4s Kh 3h As
+7d 6c 5c 4s 8h 3h As
 
-# # two pair
-# 7h Tc 9h 7d Td 5c 2c
-# 7h 8c 9h 7d 8d Qc 2c
+# two pair
+7h Tc 9h 7d Td 5c 2c
+7h 8c 9h 7d 8d Qc 2c
 
-# # pair
-# 7h 8c 9h 7d 3d Tc 2c
-# 7h 8c 9h 7d 3d Tc 2c
-# 7h 8c Kh 7d 3d Tc 2c
-# 9h 8c Kh 9d 3d Tc 2c
+# pair
+7h 8c 9h 7d 3d Tc 2c
+7h 8c 9h 7d 3d Tc 2c
+7h 8c Kh 7d 3d Tc 2c
+9h 8c Kh 9d 3d Tc 2c
 
 # high card
 5h 8c 9h 7d 3d Qh 2c
